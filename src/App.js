@@ -1,52 +1,35 @@
 import React from 'react';
 import {SafeAreaView, StyleSheet, View} from 'react-native';
-import * as Sentry from '@sentry/react-native';
 import Button from './components/Button';
 import colors from './style/colors';
 import strings from './strings';
 import ObjectInfo from './components/ObjectInfo';
-
-Sentry.init({
-  dsn: 'https://b9684b08a09f4dc3b3f2b7181b95f387@o955878.ingest.sentry.io/5905245',
-});
-
-const getRandomNumber = () => Math.floor(Math.random() * 10000);
-
-const getRandomString = () => {
-  return Math.random().toString(36).substr(2);
-};
-
-const getRandomToken = () => {
-  return getRandomString() + getRandomString();
-};
+import getRandomUser from './utils/getRandomUser';
+import {
+  setSentryError,
+  setSentryMessage,
+  Tag,
+  Context,
+} from './services/Sentry';
 
 const App = () => {
-  const userID = getRandomNumber();
-  const userName = `onimaskesi${getRandomNumber()}`;
-  const token = getRandomToken();
-
-  const user = {
-    userID,
-    userName,
-    token,
-  };
+  const user = getRandomUser;
 
   const sendUserToSentry = () => {
-    Sentry.setContext('user', user);
-    Sentry.setTag('tag', 'user');
-    Sentry.captureMessage('Whats up Sentry, i have a user for you', {
-      contexts: {
-        onlyForSend: {token: token},
-      },
-    });
+    const message = 'User Values';
+
+    const tag = new Tag('tag', 'userInfo');
+    const context = new Context('user info', user);
+
+    setSentryMessage(message, tag, context);
   };
 
   const sendErrorToSentry = () => {
     try {
-      throw new Error('Error From My Button');
+      throw new Error('Error From The Button');
     } catch (error) {
-      Sentry.setTag('tag', 'error');
-      Sentry.captureException(error);
+      const tag = new Tag('tag', 'error from the button');
+      setSentryError(error, tag, null);
     }
   };
 
