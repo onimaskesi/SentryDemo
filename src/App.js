@@ -34,7 +34,11 @@ const App = () => {
   const sendUserToSentry = () => {
     Sentry.setContext('user', user);
     Sentry.setTag('tag', 'user');
-    Sentry.captureMessage('Whats up Sentry, i have a user for you');
+    Sentry.captureMessage('Whats up Sentry, i have a user for you', {
+      contexts: {
+        onlyForSend: {token: token},
+      },
+    });
   };
 
   const sendErrorToSentry = () => {
